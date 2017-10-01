@@ -9,6 +9,9 @@
         Title="MainWindow" Height="350" Width="525"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
     <Grid>
-        
+        <StackPanel>
+            <Button Command="{Binding EncodeCommand}" Margin="5">Encode</Button>
+            <Button Command="{Binding DecodeCommand}" Margin="5">Decode</Button>
+        </StackPanel>
     </Grid>
 </Window>
