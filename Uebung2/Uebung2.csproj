@@ -89,6 +89,7 @@
     <Compile Include="Models\HistogramHelper.cs" />
     <Compile Include="Models\Huffman.cs" />
     <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\Pgm.cs" />
     <Compile Include="Models\PriorityQueue.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

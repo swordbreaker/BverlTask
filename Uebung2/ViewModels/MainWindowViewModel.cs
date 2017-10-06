@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -35,6 +36,9 @@ namespace Uebung2.ViewModels
             var bmp = (Bitmap)Image.FromFile("bridge.gif");
             var img = new Image<Gray, byte>(bmp);
 
+            var before = img.Bytes.Length;
+            Debug.WriteLine($"Image byte size; {img.Bytes.Length}");
+
             var hist = HistogramHelper.Calc(img);
 
             (var root, var codes) = Huffman.Calc(hist.Select(f => (int)f).ToArray(), img.Height * img.Width);
@@ -42,6 +46,12 @@ namespace Uebung2.ViewModels
             var data = Huffman.EncodeImage(img, codes);
 
             FileHelper.Write(HuffFile, img, root, data);
+
+            var after = File.ReadAllBytes(HuffFile).Length;
+
+            Debug.WriteLine($"Image after size {after}");
+            Debug.WriteLine($"Comprimierungs rate: {(float)before/after}");
+            
             //Write(HuffFile, img, root, data);
         }
 
