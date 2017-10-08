@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Uebung3"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+
+        <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Center">Old</TextBlock>
+        <Image Grid.Column="0" Grid.Row="1" Source="{Binding Old}"/>
+
+        <TextBlock Grid.Column="1" Grid.Row="0" TextAlignment="Center">New</TextBlock>
+        <Image Grid.Column="1" Grid.Row="1" Source="{Binding New}"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <Button Margin="5,0" Click="HistButtonClick">Histogrammausgleich</Button>
+            <Button Margin="5,0" Click="GammaButtonClick">Gamma</Button>
+            <Button Margin="5,0" Click="GammaInvButtonClick">Gamma invers</Button>
+        </StackPanel>
     </Grid>
 </Window>
