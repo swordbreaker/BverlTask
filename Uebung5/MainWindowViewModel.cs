@@ -15,6 +15,20 @@ using System.Collections.Generic;
 
 namespace Uebung5
 {
+    /**
+0 0 -1 0 0
+0 -1 -2 -1 0
+-1 -2 16 -2 -1
+0 -1 -2 -1 0
+0 0 -1 0 0
+
+0 1 2 1 0
+1 3 5 3 1
+2 5 9 5 2
+1 3 5 3 1
+0 1 2 1 0
+     */
+
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private BitmapImage _newImage;
