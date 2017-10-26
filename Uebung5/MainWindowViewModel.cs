@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Uebung2.Commands;
 using Uebung5.Annotations;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Uebung5
 {
@@ -20,13 +19,18 @@ namespace Uebung5
     {
         private BitmapImage _newImage;
         private BitmapImage _oldImage;
-        private const string _imgPath = @"Lenna.png";
+        private string _imgPath = @"saltandpepper.BMP";
 
         public string MatString { get; set; }
 
+        public float Omega { get; set; } = 1;
+
         public Matrix<int> Matrix { get; set; }
 
-        public ICommand UpdateMatrixCommand { get; set; }
+        public ICommand UpdateMatrixCommand { get; }
+        public ICommand MeadianFilterCommand { get; }
+        public ICommand GaussFilterCommand { get; }
+        public ICommand OpenFileCommand { get; set; }
 
         public BitmapImage NewImage
         {
@@ -53,6 +57,9 @@ namespace Uebung5
         public MainWindowViewModel()
         {
             UpdateMatrixCommand = new SimpleCommand(UpdateMatrix);
+            MeadianFilterCommand = new SimpleCommand(MedianFilter);
+            GaussFilterCommand = new SimpleCommand(Gauss);
+            OpenFileCommand = new SimpleCommand(OpenFile);
 
             var mat = new Matrix<int>(3, 3)
             {
@@ -70,47 +77,141 @@ namespace Uebung5
 
         private void UpdateMatrix()
         {
+            var stopwatch = Stopwatch.StartNew();
+
             Matrix = MatString.ToMatrix();
-
-            var newImg = new Image<Rgb,byte>((Bitmap)System.Drawing.Image.FromFile(_imgPath));
             (var hi, var hj) = (Matrix.Rows / 2, Matrix.Cols / 2);
-            var img = new Image<Rgb, byte>(new System.Drawing.Size(newImg.Width + 2*hj, newImg.Height + 2*hi));
-            
-            CvInvoke.CopyMakeBorder(newImg, img, hj, hj, hi, hi, BorderType.Reflect);
+            var m = new ConvolutionMatrix(Matrix.Convert<float>(), new Point(hj, hi));
 
-            var nMatrix = (Math.Abs(Matrix.Sum) > 0.0000001f)? Matrix.Convert<float>() / Matrix.Sum : Matrix.Convert<float>();
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
 
-            var kernel = new ConvolutionKernelF(nMatrix, new System.Drawing.Point(hi, hj));
-            var newImg2 = img.Convolution(kernel);
+            var result = m * img.Data;
 
-            var dataOld = img.Data;
-            var dataNew = newImg.Data;
-            for (int v = 0; v < newImg.Rows; v++)
-            {
-                for (int u = 0; u < newImg.Cols; u++)
-                {
-                    var sumR = 0f;
-                    var sumG = 0f;
-                    var sumB = 0f;
-                    for (int i = -hi; i < hi; i++)
-                    {
-                        for (int j = -hj; j < hj; j++)
-                        {
-                            sumR += dataOld[v+j+hj, u+i+hi, 0] * nMatrix[i + hi, j + hj];
-                            sumG += dataOld[v+j+hj, u+i+hi, 1] * nMatrix[i + hi, j + hj];
-                            sumB += dataOld[v+j+hj, u+i+hi, 2] * nMatrix[i + hi, j + hj];
-                        }
-                    }
-                    dataNew[v, u, 0] = (byte)sumR.Clamp(0, 255);
-                    dataNew[v, u, 1] = (byte)sumG.Clamp(0, 255);
-                    dataNew[v, u, 2] = (byte)sumB.Clamp(0, 255);
-                }
-            }
+            var resultImg = new Image<Rgb, float>(result);
 
-            NewImage = ToBitmapImage(newImg2.Bitmap);
+            Debug.WriteLine($"Linear Filter: {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
             OldImage = ToBitmapImage(img.Bitmap);
         }
 
+        private void MedianFilter()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            Matrix = MatString.ToMatrix();
+            (var hi, var hj) = (Matrix.Rows / 2, Matrix.Cols / 2);
+            var m = new ConvolutionMatrix(Matrix.Convert<float>(), new Point(hj, hi));
+
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+
+            (var w, var h, var depht) = (img.Width, img.Height, 3);
+
+            var result = new float[h, w, depht];
+            var b = img.Data;
+
+            for (int v = 0; v < h; v++)
+            {
+                for (int u = 0; u < w; u++)
+                {
+                    var values = new List<float>[depht];
+
+                    for (int k = 0; k < depht; k++) { values[k] = new List<float>(); }
+
+                    for (int i = -hi; i < hi + 1; i++)
+                    {
+                        for (int j = -hj; j < hj + 1; j++)
+                        {
+                            var x = u + j;
+                            var y = v + i;
+
+                            if (x < 0) x = Math.Abs(x);
+                            if (y < 0) y = Math.Abs(y);
+                            if (x >= w) x = (w - (x - w)) - 1;
+                            if (y >= h) y = (h - (y - h)) - 1;
+
+                            for (int k = 0; k < depht; k++)
+                            {
+                                var ig = b[y, x, k];
+                                var ma = m[i, j];
+
+                                for (int l = 0; l < ma; l++)
+                                {
+                                    values[k].Add(ig);
+                                }
+
+                            }
+                        }
+                    }
+
+                    for (int k = 0; k < depht; k++)
+                    {
+                        values[k].Sort();
+                        result[v, u, k] = values[k][values[k].Count / 2];
+                    }
+                }
+            }
+
+            var resultImg = new Image<Rgb, float>(result);
+
+            Debug.WriteLine($"Median Filter: {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
+
+
+        public void Gauss()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var width = 5;
+            var mid = width / 2;
+
+            var data = new float[1, width];
+
+            for (int i = -mid; i < mid+1; i++)
+            {
+                data[0, i+ mid] = (float)Math.Exp(-((i * i) / (2 * Omega * Omega)) );
+            }
+
+            (var hi, var hj) = (0, width/2);
+            var m1 = new ConvolutionMatrix(data, new Point(hj, hi));
+            var m2 = new ConvolutionMatrix(m1.Transpose(), new Point(hi, hj));
+
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+
+            var result = m1 * img.Data;
+            result = m2 * result;
+            
+            var resultImg = new Image<Rgb, float>(result);
+
+            Debug.WriteLine($"Linear Filter: {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+
+        }
+
+        private void OpenFile()
+        {
+            var fileDialog = new System.Windows.Forms.OpenFileDialog()
+            {
+                Filter = "Image Files(*.BMP;*.JPG;*.GIF;*PNG)|*.BMP;*.JPG;*.GIF;*PNG"
+            };
+            var result = fileDialog.ShowDialog();
+            switch (result)
+            {
+                case System.Windows.Forms.DialogResult.OK:
+                    _imgPath = fileDialog.FileName;
+                    break;
+                case System.Windows.Forms.DialogResult.Cancel:
+                default:
+                    return;
+            }
+
+            OldImage = ToBitmapImage((Bitmap)Image.FromFile(_imgPath));
+        }
 
         public BitmapImage ToBitmapImage(Bitmap bitmap)
         {
