@@ -74,6 +74,20 @@ namespace Uebung5
             return new ConvolutionMatrix(result, hotspot);
         }
 
+        public static void Clamp(float[,,] m)
+        {
+            for (int i = 0; i < m.GetLength(0); i++)
+            {
+                for (int j = 0; j < m.GetLength(1); j++)
+                {
+                    for (int k = 0; k < m.GetLength(2); k++)
+                    {
+                        if (m[i, j, k] < 0) m[i, j, k] = 0;
+                        if (m[i, j, k] > 255) m[i, j, k] = 255;
+                    }
+                }
+            }
+        }
 
         public static float[,,] operator *(ConvolutionMatrix a, float[,,] b)
         {

@@ -33,6 +33,8 @@
             <Button Command="{Binding MeadianFilterCommand}">Median Filter</Button>
             <TextBox Text="{Binding Omega}"/>
             <Button Command="{Binding GaussFilterCommand}">Gauss Filter</Button>
+            <Button Command="{Binding SobelCommand}">Sobel Filter</Button>
+            <Button Command="{Binding EdgeColorCommand}">Edge Color Filter</Button>
         </StackPanel>
     </Grid>
 </Window>

@@ -45,6 +45,8 @@ namespace Uebung5
         public ICommand MeadianFilterCommand { get; }
         public ICommand GaussFilterCommand { get; }
         public ICommand OpenFileCommand { get; set; }
+        public ICommand SobelCommand { get; set; }
+        public ICommand EdgeColorCommand { get; set; }
 
         public BitmapImage NewImage
         {
@@ -74,6 +76,8 @@ namespace Uebung5
             MeadianFilterCommand = new SimpleCommand(MedianFilter);
             GaussFilterCommand = new SimpleCommand(Gauss);
             OpenFileCommand = new SimpleCommand(OpenFile);
+            SobelCommand = new SimpleCommand(Sobel);
+            EdgeColorCommand = new SimpleCommand(EdgeColor);
 
             var mat = new Matrix<int>(3, 3)
             {
@@ -87,6 +91,85 @@ namespace Uebung5
             mat = mat.Transpose();
 
             MatString = mat.CovertToString();
+        }
+
+        private void Sobel()
+        {
+            //var m1 = new ConvolutionMatrix(new float[,]
+            //{
+            //    {-3 , 0, -3 },
+            //    {-10, 0, -10 },
+            //    {-3 , 0, -3 }
+
+            //}, new Point(1,1));
+
+            //var m2 = new ConvolutionMatrix(new float[,]
+            //{
+            //    {-3 , -10, -3 },
+            //    {0, 0, 0 },
+            //    {3 , 10, 3 }
+
+            //}, new Point(1, 1));
+
+            //var imgData = m1 * img.Data;
+            //imgData = m2 * imgData;
+
+            //ConvolutionMatrix.Clamp(imgData);
+
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+            var imgData = Sobel(img.Data);
+
+            var resultImg = new Image<Rgb, float>(imgData);
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
+
+        private void EdgeColor()
+        {
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+            var imgData = Sobel(img.Data);
+
+            var resultImg = new Image<Hsv,byte>(img.Size);
+            var data = resultImg.Data;
+
+            for (int i = 0; i < imgData.GetLength(0); i++)
+            {
+                for (int j = 0; j < imgData.GetLength(1); j++)
+                {
+                    data[i, j, 0] = (byte)imgData[i, j, 0];
+                    data[i, j, 1] = 255;
+                    data[i, j, 2] = 255;
+                }
+            }
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
+
+        private float[,,] Sobel(float[,,] img)
+        {
+            var m1 = new ConvolutionMatrix(new float[,]
+            {
+                {-3 , 0, -3 },
+                {-10, 0, -10 },
+                {-3 , 0, -3 }
+
+            }, new Point(1, 1));
+
+            var m2 = new ConvolutionMatrix(new float[,]
+            {
+                {-3 , -10, -3 },
+                {0, 0, 0 },
+                {3 , 10, 3 }
+
+            }, new Point(1, 1));
+
+            var imgData = m1 * img;
+            imgData = m2 * imgData;
+
+            ConvolutionMatrix.Clamp(imgData);
+            return imgData;
         }
 
         private void UpdateMatrix()
