@@ -282,10 +282,9 @@ namespace Uebung5
             {
                 {x, x, 1, x, x },
                 {x, 1, 1, 1, x },
-                {1, 1, 2, 1, 1},
+                {1, 1, 2, 1, 1 },
                 {x ,1, 1, 1, x },
                 {x ,x, 1, x, x },
-
             }, new Point(2, 2));
 
             var m15 = new ConvolutionMatrix(new float[,]
@@ -293,7 +292,6 @@ namespace Uebung5
                 {x, 1, x},
                 {1, 2, 1},
                 {x, 1, x},
-
             }, new Point(1, 1));
 
             var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
@@ -334,10 +332,10 @@ namespace Uebung5
 
             }, new Point(3, 3));
 
-            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
-            var data = m + ( m - img.Data);
+            var img = new Image<Gray, float>((Bitmap)Image.FromFile(_imgPath));
+            var data = m + (m - img.Data);
 
-            var resultImg = new Image<Rgb, float>(data);
+            var resultImg = new Image<Gray, float>(data);
 
             Debug.WriteLine($"Remove Solder Joints: {stopwatch.Elapsed.TotalMilliseconds}ms");
 
