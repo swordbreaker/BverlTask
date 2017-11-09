@@ -37,6 +37,8 @@
             <Button Command="{Binding EdgeColorCommand}">Edge Color Filter</Button>
             <Button Command="{Binding DilationCommand}">Dilation Filter</Button>
             <Button Command="{Binding ErosionCommand}">Erosion Filter</Button>
+            <Button Command="{Binding RemoveSolderJoinsCommand}">Remove Solder Joints</Button>
+            <Button Command="{Binding KeepSolderJoinsCommand}">Keep Solder Joints</Button>
         </StackPanel>
     </Grid>
 </Window>

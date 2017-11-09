@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Controls;
 using Emgu.CV;
 using PointI = System.Drawing.Point;
 
@@ -201,7 +202,7 @@ namespace Uebung5
         {
             (var h, var w, var depht) = (b.GetLength(0), b.GetLength(1), b.GetLength(2));
             (var hi, var hj) = (a.Hotspot.Y, a.Hotspot.X);
-            var m = a.Normalized;
+            var m = a;
 
             var result = new float[h, w, depht];
 
@@ -228,17 +229,19 @@ namespace Uebung5
                             if (y < 0) y = Math.Abs(y);
                             if (x >= w) x = (w - (x - w)) - 1;
                             if (y >= h) y = (h - (y - h)) - 1;
-
-                            if (m[i, j] == float.NegativeInfinity) continue;
                             for (int k = 0; k < depht; k++)
                             {
                                 switch (morphType)
                                 {
                                     case MorphType.Dilation:
-                                        values[k][c] = b[y, x, k] + m[i, j];
+                                        values[k][c] = float.IsPositiveInfinity(m[i, j])
+                                            ? float.MinValue
+                                            : b[y, x, k] + m[i, j];
                                         break;
                                     case MorphType.Erosion:
-                                        values[k][c] = b[y, x, k] - m[i, j];
+                                        values[k][c] = float.IsPositiveInfinity(m[i, j])
+                                            ? float.MaxValue
+                                            : b[y, x, k] - m[i, j];
                                         break;
                                 }
                                 

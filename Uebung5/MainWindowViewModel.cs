@@ -49,6 +49,8 @@ namespace Uebung5
         public ICommand EdgeColorCommand { get; set; }
         public ICommand DilationCommand { get; set; }
         public ICommand ErosionCommand { get; set; }
+        public ICommand RemoveSolderJoinsCommand { get; set; }
+        public ICommand KeepSolderJoinsCommand { get; set; }
 
         public BitmapImage NewImage
         {
@@ -82,6 +84,9 @@ namespace Uebung5
             EdgeColorCommand = new SimpleCommand(EdgeColor);
             DilationCommand = new SimpleCommand(Dilation);
             ErosionCommand = new SimpleCommand(Erosion);
+            RemoveSolderJoinsCommand = new SimpleCommand(RemoveSolderJoints);
+            KeepSolderJoinsCommand = new SimpleCommand(KeepSolderJoints);
+
 
             var mat = new Matrix<int>(3, 3)
             {
@@ -272,7 +277,7 @@ namespace Uebung5
 
         private void Morph(ConvolutionMatrix.MorphType morphType)
         {
-            float x = float.NegativeInfinity;
+            float x = float.PositiveInfinity;
             var m25 = new ConvolutionMatrix(new float[,]
             {
                 {x, x, 1, x, x },
@@ -307,6 +312,102 @@ namespace Uebung5
             ConvolutionMatrix.Clamp(imgData);
 
             var resultImg = new Image<Rgb, float>(imgData);
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
+
+        private void RemoveSolderJoints()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            float x = float.PositiveInfinity;
+            var m = new ConvolutionMatrix(new float[,]
+            {
+                {x, x, x, 1, x, x, x},
+                {x, 1, 1, 1, 1, 1, x},
+                {x, 1, 1, x, 1, 1, x},
+                {1, 1, x, x, x, 1, 1},
+                {x, 1, 1, x, 1, 1, x},
+                {x, 1, 1, 1, 1, 1, x},
+                {x, x, x, 1, x, x, x},
+
+            }, new Point(3, 3));
+
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+            var data = m + ( m - img.Data);
+
+            var resultImg = new Image<Rgb, float>(data);
+
+            Debug.WriteLine($"Remove Solder Joints: {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
+
+        private void KeepSolderJoints()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var x = float.PositiveInfinity;
+            var m1 = new ConvolutionMatrix(new[,]
+            {
+                {x, x, x, x, x, x, x, x, x},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {x, x, x, x, x, x, x, x, x},
+
+            }, new Point(4, 1));
+
+            var m2 = new ConvolutionMatrix(new[,]
+            {
+                {x, 1, x},
+                {x, 1, x},
+                {x, 1, x},
+                {x, 1, x},
+                {x, 2, x},
+                {x, 1, x},
+                {x, 1, x},
+                {x, 1, x},
+                {x, 1, x},
+            }, new Point(1, 4));
+
+            var m3 = new ConvolutionMatrix(new[,]
+            {
+                {1, x, x, x, x, x, x},
+                {x, 1, x, x, x, x, x},
+                {x, x, 1, x, x, x, x},
+                {x, x, x, 2, x, x, x},
+                {x, x, x, x, 1, x, x},
+                {x, x, x, x, x, 1, x},
+                {x, x, x, x, x, x, 1},
+            }, new Point(3, 3));
+
+            var m4 = new ConvolutionMatrix(new[,]
+            {
+                {x, x, x, x, x, x, 1},
+                {x, x, x, x, x, 1, x},
+                {x, x, x, x, 1, x, x},
+                {x, x, x, 2, x, x, x},
+                {x, x, 1, x, x, x, x},
+                {x, 1, x, x, x, x, x},
+                {1, x, x, x, x, x, x},
+            }, new Point(3, 3));
+
+            var img = new Image<Gray, float>((Bitmap)Image.FromFile(_imgPath));
+            var data1 = m1 + (m1 - img.Data);
+            var data2 = m2 + (m2 - img.Data);
+            var data3 = m3 + (m3 - img.Data);
+            var data4 = m4 + (m4 - img.Data);
+
+            var resultImg1 = new Image<Gray, float>(data1);
+            var resultImg2 = new Image<Gray, float>(data2);
+            var resultImg3 = new Image<Gray, float>(data3);
+            var resultImg4 = new Image<Gray, float>(data4);
+            var resultImg = resultImg1.And(resultImg2);
+            resultImg = resultImg.And(resultImg3);
+            resultImg = resultImg.And(resultImg4);
+
+            Debug.WriteLine($"Keep Solder Joints: {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             NewImage = ToBitmapImage(resultImg.Bitmap);
             OldImage = ToBitmapImage(img.Bitmap);
