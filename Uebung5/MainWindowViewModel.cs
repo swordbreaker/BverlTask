@@ -47,6 +47,8 @@ namespace Uebung5
         public ICommand OpenFileCommand { get; set; }
         public ICommand SobelCommand { get; set; }
         public ICommand EdgeColorCommand { get; set; }
+        public ICommand DilationCommand { get; set; }
+        public ICommand ErosionCommand { get; set; }
 
         public BitmapImage NewImage
         {
@@ -78,6 +80,8 @@ namespace Uebung5
             OpenFileCommand = new SimpleCommand(OpenFile);
             SobelCommand = new SimpleCommand(Sobel);
             EdgeColorCommand = new SimpleCommand(EdgeColor);
+            DilationCommand = new SimpleCommand(Dilation);
+            ErosionCommand = new SimpleCommand(Erosion);
 
             var mat = new Matrix<int>(3, 3)
             {
@@ -162,7 +166,6 @@ namespace Uebung5
                 {-3 , -10, -3 },
                 {0, 0, 0 },
                 {3 , 10, 3 }
-
             }, new Point(1, 1));
 
             var imgData = m1 * img;
@@ -257,6 +260,57 @@ namespace Uebung5
             OldImage = ToBitmapImage(img.Bitmap);
         }
 
+        private void Dilation()
+        {
+            Morph(ConvolutionMatrix.MorphType.Dilation);
+        }
+
+        private void Erosion()
+        {
+            Morph(ConvolutionMatrix.MorphType.Erosion);
+        }
+
+        private void Morph(ConvolutionMatrix.MorphType morphType)
+        {
+            float x = float.NegativeInfinity;
+            var m25 = new ConvolutionMatrix(new float[,]
+            {
+                {x, x, 1, x, x },
+                {x, 1, 1, 1, x },
+                {1, 1, 2, 1, 1},
+                {x ,1, 1, 1, x },
+                {x ,x, 1, x, x },
+
+            }, new Point(2, 2));
+
+            var m15 = new ConvolutionMatrix(new float[,]
+            {
+                {x, 1, x},
+                {1, 2, 1},
+                {x, 1, x},
+
+            }, new Point(1, 1));
+
+            var img = new Image<Rgb, float>((Bitmap)Image.FromFile(_imgPath));
+
+            float[,,] imgData = null;
+            switch (morphType)
+            {
+                case ConvolutionMatrix.MorphType.Dilation:
+                    imgData = m15 - img.Data;
+                    break;
+                case ConvolutionMatrix.MorphType.Erosion:
+                    imgData = m15 + img.Data;
+                    break;
+            }
+           
+            ConvolutionMatrix.Clamp(imgData);
+
+            var resultImg = new Image<Rgb, float>(imgData);
+
+            NewImage = ToBitmapImage(resultImg.Bitmap);
+            OldImage = ToBitmapImage(img.Bitmap);
+        }
 
         public void Gauss()
         {
@@ -294,7 +348,7 @@ namespace Uebung5
         {
             var fileDialog = new System.Windows.Forms.OpenFileDialog()
             {
-                Filter = "Image Files(*.BMP;*.JPG;*.GIF;*PNG)|*.BMP;*.JPG;*.GIF;*PNG"
+                Filter = "Image Files(*.BMP;*.JPG;*.GIF;*PNG;*TIF)|*.BMP;*.JPG;*.GIF;*PNG;*TIF"
             };
             var result = fileDialog.ShowDialog();
             switch (result)

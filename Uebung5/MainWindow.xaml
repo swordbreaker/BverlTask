@@ -35,6 +35,8 @@
             <Button Command="{Binding GaussFilterCommand}">Gauss Filter</Button>
             <Button Command="{Binding SobelCommand}">Sobel Filter</Button>
             <Button Command="{Binding EdgeColorCommand}">Edge Color Filter</Button>
+            <Button Command="{Binding DilationCommand}">Dilation Filter</Button>
+            <Button Command="{Binding ErosionCommand}">Erosion Filter</Button>
         </StackPanel>
     </Grid>
 </Window>
