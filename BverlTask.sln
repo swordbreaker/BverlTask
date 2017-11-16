@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uebung1", "Uebung1\Uebung1.csproj", "{D8017810-67CA-4F64-8422-E7A8FF5F6A81}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uebung3", "Uebung3\Uebung3.csproj", "{7CA4DA4D-B3B7-4E16-830F-263EB44024CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uebung5", "Uebung5\Uebung5.csproj", "{9007BF16-11C9-46F6-BD00-0B0F22525508}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projection", "Projection\Projection.csproj", "{9E01CAC0-8F51-42B6-9D23-70F4F8298F97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9007BF16-11C9-46F6-BD00-0B0F22525508}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9007BF16-11C9-46F6-BD00-0B0F22525508}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9007BF16-11C9-46F6-BD00-0B0F22525508}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E01CAC0-8F51-42B6-9D23-70F4F8298F97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E01CAC0-8F51-42B6-9D23-70F4F8298F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E01CAC0-8F51-42B6-9D23-70F4F8298F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E01CAC0-8F51-42B6-9D23-70F4F8298F97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,24 @@
+﻿<Window x:Class="Projection.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Projection"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        
+        <Image Source="{Binding Img}" x:Name="Bla"/>
+        <Image HorizontalAlignment="Left" Grid.Column="1" Grid.Row="0" Source="{Binding VImg}" Height="{Binding ElementName=Bla, Path=ActualHeight}" Stretch="Fill"/>
+        <Image VerticalAlignment="Top" Grid.Row="1" Grid.Column="0" Source="{Binding HImg}" Width="{Binding ElementName=Bla, Path=ActualWidth}" Stretch="Fill"/>
+    </Grid>
+</Window>
