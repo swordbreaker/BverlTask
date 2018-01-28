@@ -31,22 +31,9 @@ namespace Uebung5
             Hotspot = hostpot;
         }
 
-        public new float this[int row, int col]
-        {
-            get
-            {
-                return base[row + Hotspot.Y, col + Hotspot.X];
-            }
-        }
+        public new float this[int row, int col] => base[row + Hotspot.Y, col + Hotspot.X];
 
-        public ConvolutionMatrix Normalized
-        {
-            get
-            {
-                if (this.Sum == 0) return this;
-                else return new ConvolutionMatrix(this / Sum, Hotspot);
-            }
-        }
+        public ConvolutionMatrix Normalized => this.Sum == 0 ? this : new ConvolutionMatrix(this / Sum, Hotspot);
 
         public static ConvolutionMatrix Convolute(ConvolutionMatrix a, ConvolutionMatrix b, PointI hotspot)
         {
@@ -112,7 +99,7 @@ namespace Uebung5
             {
                 for (int u = 0; u < w; u++)
                 {
-                    float[] sum = new float[depht];
+                    var sum = new float[depht];
                     for (int i = -hi; i < hi + 1; i++)
                     {
                         for (int j = -hj; j < hj + 1; j++)
@@ -150,52 +137,6 @@ namespace Uebung5
         public static float[,,] operator -(ConvolutionMatrix a, float[,,] b)
         {
             return Morph(a, b, MorphType.Dilation);
-            //(var h, var w, var depht) = (b.GetLength(0), b.GetLength(1), b.GetLength(2));
-            //(var hi, var hj) = (a.Hotspot.Y, a.Hotspot.X);
-            //var m = a.Normalized;
-
-            //var result = new float[h, w, depht];
-
-            //for (int v = 0; v < h; v++)
-            //{
-            //    for (int u = 0; u < w; u++)
-            //    {
-            //        float[][] values = new float[depht][];
-            //        int c = 0;
-
-            //        for (int i = 0; i < depht; i++)
-            //        {
-            //            values[i] = new float[m.Rows * m.Cols];
-            //        }
-
-            //        for (int i = -hi; i < hi + 1; i++)
-            //        {
-            //            for (int j = -hj; j < hj + 1; j++,c++)
-            //            {
-            //                var x = u + j;
-            //                var y = v + i;
-
-            //                if (x < 0) x = Math.Abs(x);
-            //                if (y < 0) y = Math.Abs(y);
-            //                if (x >= w) x = (w - (x - w)) - 1;
-            //                if (y >= h) y = (h - (y - h)) - 1;
-
-            //                if(m[i,j] == float.NegativeInfinity) continue;
-            //                for (int k = 0; k < depht; k++)
-            //                {
-            //                    values[k][c] = b[y, x, k] + m[i, j];
-            //                }
-            //            }
-            //        }
-
-            //        for (int k = 0; k < depht; k++)
-            //        {
-            //            result[v, u, k] = values[k].Max();
-            //        }
-            //    }
-            //}
-
-            //return result;
         }
 
         private static float[,,] Morph(ConvolutionMatrix a, float[,,] b, MorphType morphType)

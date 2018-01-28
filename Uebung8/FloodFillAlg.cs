@@ -11,7 +11,7 @@ namespace Uebung8
         private static byte[,,] _data;
         private static byte[,,] _newData;
 
-        private static Color[] _colors =
+        private static readonly Color[] _colors =
         {
             Colors.Blue, Colors.Red, Colors.Green, Colors.Yellow, Colors.Orange, Colors.Violet, Colors.Pink,
             Colors.YellowGreen, Colors.Aqua

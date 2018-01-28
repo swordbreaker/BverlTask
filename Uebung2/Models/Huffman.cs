@@ -30,8 +30,8 @@ namespace Uebung2.Models
 
             entropie = -entropie;
 
-            // Mittlere Codel�nge und Speicherbedarf absch�tzen (Unter- und Obergrenze)
-            // Verwenden Sie f�r die Ausgabe z.B. einen MessageDialog
+            // Mittlere Codelänge und Speicherbedarf absch�tzen (Unter- und Obergrenze)
+            // Verwenden Sie für die Ausgabe z.B. einen MessageDialog
             Debug.WriteLine($"Code länge zwischen {entropie} und {entropie+1}");
 
             // Mittlere Codel�nge und Speicherbedarf berechnen und ausgeben
